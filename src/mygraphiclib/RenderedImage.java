@@ -20,6 +20,7 @@ import java.util.ArrayList;
 public class RenderedImage {
     
     private BufferedImage bi;
+    private TriangleObject3D to;
 
     public RenderedImage() {
         int width = Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -37,17 +38,15 @@ public class RenderedImage {
         g.fillRect(0, 0, width, height);
     }
     
+    public void setModel(Model model) {
+        to = model.getDraw();
+    }
+    
     public void paint() {
         System.out.println("RenderedImage: paint");
-        Vertex3D v1 = new Vertex3D(-200, -100, 10);
-        Vertex3D v2 = new Vertex3D(500, -200, 100);
-        Vertex3D v3 = new Vertex3D(300, 400, 50);
-        Triangle3D t = new Triangle3D(v1, v2, v3);
-        ArrayList<Triangle3D> ta = new ArrayList<>();
-        ta.add(t);
-        TriangleObject3D to = new TriangleObject3D(ta);
+        //to.triangles.get(0).getV1().rotate(5, 0, 0);
         to.drawPerspective(bi);
-        to.drawOrtho(bi);
+        //to.drawOrtho(bi);
         
         Vertex3D xv1 = new Vertex3D(100 - bi.getWidth() / 2, -10000, 0);
         Vertex3D xv2 = new Vertex3D(100 - bi.getWidth() / 2, 10000, 0);

@@ -21,8 +21,10 @@ public class MyGraphicLib {
         JFrame frame = new JFrame();
         frame.setSize(900, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        RenderPanel rp = new RenderPanel();
         frame.add(new RenderPanel());
         frame.setVisible(true);
+
     }
     
 }
