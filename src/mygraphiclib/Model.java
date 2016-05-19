@@ -5,27 +5,41 @@
  */
 package mygraphiclib;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author tukalov
  */
 public class Model {
     
-    private TriangleObject3D to;
+    private Object3D object;
+    private Vector vector;
     
-    public Model() {
+    public Model(Vector vector) {
         Vertex3D v1 = new Vertex3D(-200, -100, 10);
         Vertex3D v2 = new Vertex3D(500, -200, 100);
         Vertex3D v3 = new Vertex3D(300, 400, 50);
-        Triangle3D t = new Triangle3D(v1, v2, v3);
-        ArrayList<Triangle3D> ta = new ArrayList<>();
-        ta.add(t);
-        to = new TriangleObject3D(ta);
+        this.vector = vector;
+        object = new Object3D(vector);
+        object.add(v1);
+        object.add(v2);
+        object.add(v3);
+        
+        object.setLine(0, 1);
+        object.setLine(0, 2);
+        object.setLine(1, 2);
+        
+        /*
+        object.addLine(v1, v2);
+        object.addLine(v1, v3);
+        object.addLine(v2, v3);
+        */
     }
     
-    public TriangleObject3D getDraw() {
-        return to;
+    public Object3D getDraw() {
+        return object;
+    }
+    
+    public Vector getVector() {
+        return vector;
     }
 }

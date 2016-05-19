@@ -40,23 +40,26 @@ public class Vector {
     }
     
     public Vector rotateX(double rotation) {
-        this.x = this.x;
-        this.y = y * Math.cos(rotation) - z * Math.sin(rotation);
-        this.z = y * Math.sin(rotation) + z * Math.cos(rotation);
+        double rot = Math.toRadians(rotation);
+        //this.x = this.x;
+        this.y = y * Math.cos(rot) - z * Math.sin(rot);
+        this.z = y * Math.sin(rot) + z * Math.cos(rot);
         return this;
     }
     
     public Vector rotateY(double rotation) {
-        this.x = x * Math.cos(rotation) + z * Math.sin(rotation);
-        this.y = this.y;
-        this.z = - x * Math.sin(rotation) + z * Math.cos(rotation);
+        double rot = Math.toRadians(rotation);
+        this.x = x * Math.cos(rot) + z * Math.sin(rot);
+        //this.y = this.y;
+        this.z = - x * Math.sin(rot) + z * Math.cos(rot);
         return this;
     }
     
     public Vector rotateZ(double rotation) {
-        this.x = x * Math.cos(rotation) - y * Math.sin(rotation);
-        this.y = x * Math.sin(rotation) + y * Math.cos(rotation);
-        this.z = this.z;
+        double rot = Math.toRadians(rotation);
+        this.x = x * Math.cos(rot) - y * Math.sin(rot);
+        this.y = x * Math.sin(rot) + y * Math.cos(rot);
+        //this.z = this.z;
         return this;
     }
 }

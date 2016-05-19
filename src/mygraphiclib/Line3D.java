@@ -5,6 +5,8 @@
  */
 package mygraphiclib;
 
+import java.awt.Color;
+
 /**
  *
  * @author tukalov
@@ -13,15 +15,18 @@ public class Line3D {
     
     private Vertex3D v1;
     private Vertex3D v2;
+    private Color color;
     
     public Line3D() {
         this.v1 = new Vertex3D();
         this.v2 = new Vertex3D();
+        this.color = Color.WHITE;
     }
     
     public Line3D(Vertex3D v1, Vertex3D v2) {
         this.v1 = v1;
         this.v2 = v2;
+        this.color = Color.WHITE;
     }
     
     public Vertex3D getV1() {
@@ -52,11 +57,15 @@ public class Line3D {
                 + Math.pow((z2 - z1), 2));
     }
 
-    public PerspectiveVertex getPerspectiveV1() {
-        return v1.getPerspective();
+    public PerspectiveVertex getPerspectiveV1(Vector basisVector) {
+        return v1.getPerspective(basisVector);
     }
 
-    public PerspectiveVertex getPerspectiveV2() {
-        return v2.getPerspective();
+    public PerspectiveVertex getPerspectiveV2(Vector basisVector) {
+        return v2.getPerspective(basisVector);
+    }
+    
+    public Color getColor() {
+        return this.color;
     }
 }

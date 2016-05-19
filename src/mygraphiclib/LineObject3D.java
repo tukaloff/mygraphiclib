@@ -16,13 +16,18 @@ import java.util.ArrayList;
  * @author tukalov
  */
 public class LineObject3D extends Object3D{
-    
-    public LineObject3D(ArrayList<Line3D> lines) {
-        super.lines = lines;
+
+    public LineObject3D(Vector basisVector) {
+        super(basisVector);
     }
-    
+    /*
+    public LineObject3D(ArrayList<Line3D> lines, Vector basisVector) {
+        super.lines = lines;
+        super.basisVector = basisVector;
+    }
+    */
     public void drawOrtho(BufferedImage bi) {
-        System.out.println("TriangleObject3D: drawOrtho");
+        //System.out.println("TriangleObject3D: drawOrtho");
         for (Line3D l : super.lines) {
             Color color = new Color(50, 50, 50);
             int x1 = (int) l.getOrthoV1().getX();
@@ -34,13 +39,13 @@ public class LineObject3D extends Object3D{
     }
     
     public void drawPerspective(BufferedImage bi) {
-        System.out.println("TriangleObject3D: drawPerspective");
+        //System.out.println("TriangleObject3D: drawPerspective");
         for (Line3D l : super.lines) {
             Color color = new Color(50, 50, 50);
-            int x1 = (int) l.getPerspectiveV1().getX();
-            int y1 = (int) l.getPerspectiveV1().getY();
-            int x2 = (int) l.getPerspectiveV2().getX();
-            int y2 = (int) l.getPerspectiveV2().getY();
+            int x1 = (int) l.getPerspectiveV1(basisVector).getX();
+            int y1 = (int) l.getPerspectiveV1(basisVector).getY();
+            int x2 = (int) l.getPerspectiveV2(basisVector).getX();
+            int y2 = (int) l.getPerspectiveV2(basisVector).getY();
             super.drawLine(x1, y1, x2, y2, bi, color.getRGB());
         }
     }

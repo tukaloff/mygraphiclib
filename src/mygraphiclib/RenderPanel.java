@@ -22,13 +22,13 @@ public class RenderPanel extends JPanel {
     
     public RenderPanel() {
         super();
-        model = new Model();
+        model = new Model(new Vector(100, 100, 100));
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(100);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RenderPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -41,10 +41,10 @@ public class RenderPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        System.out.println("RenderPanel: paint");
+        //System.out.println("RenderPanel: paint");
         Graphics2D g2 = (Graphics2D) g;
         RenderedImage ri = new RenderedImage(g.getClipBounds().width, g.getClipBounds().height);
-        model.getDraw().triangles.get(0).getV1().rotate(0, 1, 0);
+        
         ri.setModel(model);
         ri.paint();
         g2.setPaint(new TexturePaint(ri.getBufferedImage(), g.getClipBounds()));
