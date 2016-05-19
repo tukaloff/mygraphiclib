@@ -13,13 +13,14 @@ public class Model {
     
     private Object3D object;
     private Vector vector;
+    private Vector basis = new Vector(1, 1, 1);
     
     public Model(Vector vector) {
-        Vertex3D v1 = new Vertex3D(-200, -100, 10);
-        Vertex3D v2 = new Vertex3D(500, -200, 100);
-        Vertex3D v3 = new Vertex3D(300, 400, 50);
         this.vector = vector;
-        object = new Object3D(vector);
+        Vertex3D v1 = new Vertex3D(new Vector(-200, -100, 10));
+        Vertex3D v2 = new Vertex3D(new Vector(500, -200, 100));
+        Vertex3D v3 = new Vertex3D(new Vector(300, 400, 50));
+        object = new Object3D(vector, basis);
         object.add(v1);
         object.add(v2);
         object.add(v3);

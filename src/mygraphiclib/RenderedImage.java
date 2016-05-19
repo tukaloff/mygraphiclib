@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -47,7 +46,7 @@ public class RenderedImage {
         //System.out.println("RenderedImage: paint");
         
         //to.getVector().rotateX(1);
-        obj.rotate(1,0,0);
+        obj.rotate(0, 0, 1);
         
         //to.triangles.get(0).getV1().rotate(5, 0, 0);
         obj.paintLines(bi);

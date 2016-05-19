@@ -37,17 +37,17 @@ public class Triangle3D {
         l2 = new Line3D(v1, v3);
         l3 = new Line3D(v2, v3);
     }
-    
+    /*
     public double getPerimeter() {
         return l1.getLenght() + l2.getLenght() + l3.getLenght();
-    }
-    
+    }*/
+    /*
     public double getArea() {
         double p = getPerimeter() / 2;
         return Math.sqrt(p * (p - l1.getLenght()) 
                 * (p - l2.getLenght()) 
                 * (p - l3.getLenght()));
-    }
+    }*/
     
     public Vertex3D getV1() {
         return v1;

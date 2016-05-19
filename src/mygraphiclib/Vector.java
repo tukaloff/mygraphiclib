@@ -41,25 +41,43 @@ public class Vector {
     
     public Vector rotateX(double rotation) {
         double rot = Math.toRadians(rotation);
+        double c = Math.cos(rot);
+        double s = Math.sin(rot);
         //this.x = this.x;
-        this.y = y * Math.cos(rot) - z * Math.sin(rot);
-        this.z = y * Math.sin(rot) + z * Math.cos(rot);
+        this.y = y * c - z * s;
+        this.z = y * s + z * c;
         return this;
     }
     
     public Vector rotateY(double rotation) {
         double rot = Math.toRadians(rotation);
-        this.x = x * Math.cos(rot) + z * Math.sin(rot);
+        double c = Math.cos(rot);
+        double s = Math.sin(rot);
+        this.x = x * c + z * s;
         //this.y = this.y;
-        this.z = - x * Math.sin(rot) + z * Math.cos(rot);
+        this.z = - x * s + z * c;
         return this;
     }
     
     public Vector rotateZ(double rotation) {
         double rot = Math.toRadians(rotation);
-        this.x = x * Math.cos(rot) - y * Math.sin(rot);
-        this.y = x * Math.sin(rot) + y * Math.cos(rot);
+        double c = Math.cos(rot);
+        double s = Math.sin(rot);
+        this.x = x * c - y * s;
+        this.y = x * s + y * c;
         //this.z = this.z;
         return this;
+    }
+    
+    public static Vector getSum(Vector vector1, Vector vector2) {
+        return new Vector(vector1.getX() + vector2.getX(), 
+                vector1.getY() + vector2.getY(), 
+                vector1.getZ() + vector2.getZ());
+    }
+    
+    public static Vector getRotate(Vector vector1, Vector vector2) {
+        return new Vector(vector1.getX() * vector2.getX(), 
+                vector1.getY() * vector2.getY(), 
+                vector1.getZ() * vector2.getZ());
     }
 }

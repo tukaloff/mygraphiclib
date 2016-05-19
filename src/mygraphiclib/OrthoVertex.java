@@ -14,9 +14,9 @@ public class OrthoVertex {
     private double x;
     private double y;
     
-    public OrthoVertex(Vertex3D v3d) {
-        this.x = v3d.getX();
-        this.y = v3d.getY();
+    public OrthoVertex(Vertex3D v3d, Vector basis) {
+        this.x = basis.getX();
+        this.y = basis.getY();
     }
     
     public double getX() {

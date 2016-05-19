@@ -5,6 +5,7 @@
  */
 package mygraphiclib;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -22,13 +23,15 @@ public class Object3D{
     protected int distX;
     protected int distY;
     protected Vector basisVector;
+    protected Vector rotation;
     
     protected double rx = 0;
     protected double ry = 0;
     protected double rz = 0;
     
-    public Object3D(Vector basisVector) {
-        this.basisVector = basisVector;
+    public Object3D(Vector basis, Vector rotation) {
+        this.basisVector = basis;
+        this.rotation = rotation;
     }
     
     public void add(Vertex3D v)  {
@@ -56,25 +59,28 @@ public class Object3D{
     
     public void paintLines(BufferedImage bi) {
         for(Line3D line : lines) {
-            Vertex3D v1 = new Vertex3D(line.getV1().getX(), line.getV1().getY(), line.getV1().getZ());
-            v1.translate(basisVector);
-            PerspectiveVertex pv1 = v1.getPerspective(basisVector);
-            Vertex3D v2 = new Vertex3D(line.getV2().getX(), line.getV2().getY(), line.getV2().getZ());
-            v2.translate(basisVector);
-            PerspectiveVertex pv2 = v2.getPerspective(basisVector);
-            //PerspectiveVertex v1 = line.getPerspectiveV1(basisVector);
-            //PerspectiveVertex v2 = line.getPerspectiveV2(basisVector);
-            drawLine((int)pv1.getX(), (int)pv1.getY(), (int)pv2.getX(), (int)pv2.getY(), bi, line.getColor().getRGB());
+            Vector absVector1 = Vector.getSum(Vector.getRotate(line.getV1().getVector(), rotation), basisVector);
+            Vector absVector2 = Vector.getSum(Vector.getRotate(line.getV2().getVector(), rotation), basisVector);
+            PerspectiveVertex pv1 = new PerspectiveVertex(absVector1);
+            PerspectiveVertex pv2 = new PerspectiveVertex(absVector2);
+            drawLine((int)pv1.getX(), (int)pv1.getY(), (int)pv2.getX(), (int)pv2.getY(), bi, Color.WHITE.getRGB());
         }
     }
     
     public void rotate(double rx, double ry, double rz) {
+        if (rx > 0)
+            rotation.rotateX(rx);
+        if (ry > 0)
+            rotation.rotateY(ry);
+        if (rz > 0)
+            rotation.rotateZ(rz);
+        /*
         this.rx += rx - Math.round(this.rx / 360) * 360;
         this.ry += ry - Math.round(this.ry / 360) * 360;
         this.rz += rz - Math.round(this.rz / 360) * 360;
         for(Vertex3D v : vertexes) {
             v.rotate(this.rx, this.ry, this.rz);
-        }
+        }*/
     }
     
     protected void drawLine(int x1, int y1, int x2, int y2, BufferedImage bi, int rgb) {
