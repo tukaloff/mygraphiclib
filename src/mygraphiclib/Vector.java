@@ -16,9 +16,9 @@ public class Vector {
     private double z;
     
     public Vector() {
-        x = 0;
-        y = 0;
-        z = 0;
+        x = 1;
+        y = 1;
+        z = 1;
     }
     
     public Vector(double x, double y, double z) {
@@ -44,8 +44,8 @@ public class Vector {
         double c = Math.cos(rot);
         double s = Math.sin(rot);
         //this.x = this.x;
-        this.y = y * c - z * s;
-        this.z = y * s + z * c;
+        this.y = y * c + z * s;
+        this.z = - y * s + z * c;
         return this;
     }
     
@@ -53,9 +53,9 @@ public class Vector {
         double rot = Math.toRadians(rotation);
         double c = Math.cos(rot);
         double s = Math.sin(rot);
-        this.x = x * c + z * s;
+        this.x = x * c - z * s;
         //this.y = this.y;
-        this.z = - x * s + z * c;
+        this.z = x * s + z * c;
         return this;
     }
     
@@ -63,21 +63,24 @@ public class Vector {
         double rot = Math.toRadians(rotation);
         double c = Math.cos(rot);
         double s = Math.sin(rot);
-        this.x = x * c - y * s;
-        this.y = x * s + y * c;
+        this.x = x * c + y * s;
+        this.y = - x * s + y * c;
         //this.z = this.z;
         return this;
     }
     
     public static Vector getSum(Vector vector1, Vector vector2) {
-        return new Vector(vector1.getX() + vector2.getX(), 
+        return new Vector(
+                vector1.getX() + vector2.getX(), 
                 vector1.getY() + vector2.getY(), 
                 vector1.getZ() + vector2.getZ());
     }
     
     public static Vector getRotate(Vector vector1, Vector vector2) {
-        return new Vector(vector1.getX() * vector2.getX(), 
-                vector1.getY() * vector2.getY(), 
-                vector1.getZ() * vector2.getZ());
+        return new Vector(
+                vector1.getY() * vector2.getZ() - vector1.getZ() * vector2.getY(),
+                vector1.getZ() * vector2.getX() - vector1.getX() * vector2.getZ(),
+                vector1.getX() * vector2.getY() - vector1.getY() * vector2.getX()
+                );
     }
 }

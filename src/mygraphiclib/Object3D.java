@@ -59,8 +59,12 @@ public class Object3D{
     
     public void paintLines(BufferedImage bi) {
         for(Line3D line : lines) {
-            Vector absVector1 = Vector.getSum(Vector.getRotate(line.getV1().getVector(), rotation), basisVector);
-            Vector absVector2 = Vector.getSum(Vector.getRotate(line.getV2().getVector(), rotation), basisVector);
+            Vector vVec1 = line.getV1().getVector();
+            Vector vVec2 = line.getV2().getVector();
+            Vector rot1 = Vector.getRotate(vVec1, rotation);
+            Vector rot2 = Vector.getRotate(vVec2, rotation);
+            Vector absVector1 = Vector.getSum(rot1, basisVector);
+            Vector absVector2 = Vector.getSum(rot2, basisVector);
             PerspectiveVertex pv1 = new PerspectiveVertex(absVector1);
             PerspectiveVertex pv2 = new PerspectiveVertex(absVector2);
             drawLine((int)pv1.getX(), (int)pv1.getY(), (int)pv2.getX(), (int)pv2.getY(), bi, Color.WHITE.getRGB());
@@ -74,13 +78,6 @@ public class Object3D{
             rotation.rotateY(ry);
         if (rz > 0)
             rotation.rotateZ(rz);
-        /*
-        this.rx += rx - Math.round(this.rx / 360) * 360;
-        this.ry += ry - Math.round(this.ry / 360) * 360;
-        this.rz += rz - Math.round(this.rz / 360) * 360;
-        for(Vertex3D v : vertexes) {
-            v.rotate(this.rx, this.ry, this.rz);
-        }*/
     }
     
     protected void drawLine(int x1, int y1, int x2, int y2, BufferedImage bi, int rgb) {

@@ -11,7 +11,7 @@ package mygraphiclib;
  */
 public class Vertex3D {
     
-    private double[][] matrix = TransformMatrix.getSimpleMatrix();
+    //private double[][] matrix = TransformMatrix.getSimpleMatrix();
     private Vector vector;
     
     public Vertex3D() {

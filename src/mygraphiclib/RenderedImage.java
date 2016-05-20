@@ -46,7 +46,7 @@ public class RenderedImage {
         //System.out.println("RenderedImage: paint");
         
         //to.getVector().rotateX(1);
-        obj.rotate(0, 0, 1);
+        obj.rotate(1, 0, 0);
         
         //to.triangles.get(0).getV1().rotate(5, 0, 0);
         obj.paintLines(bi);
