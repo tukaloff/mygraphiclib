@@ -19,8 +19,7 @@ import java.awt.image.BufferedImage;
 public class RenderedImage {
     
     private BufferedImage bi;
-    //private TriangleObject3D to;
-    private Object3D obj;
+    private Model model;
 
     public RenderedImage() {
         int width = Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -39,17 +38,17 @@ public class RenderedImage {
     }
     
     public void setModel(Model model) {
-        obj = model.getDraw();
+        this.model = model;
     }
     
     public void paint() {
         //System.out.println("RenderedImage: paint");
         
         //to.getVector().rotateX(1);
-        obj.rotate(2, 2, 2);
+        //obj.rotate(2, 2, 2);
         
         //to.triangles.get(0).getV1().rotate(5, 0, 0);
-        obj.paintLines(bi);
+        model.paint(bi);
         //to.drawOrtho(bi);
         /*
         Vertex3D xv1 = new Vertex3D(100 - bi.getWidth() / 2, -10000, 0);

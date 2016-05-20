@@ -18,6 +18,10 @@ public class Vertex3D {
         
     }
     
+    public Vertex3D(double x, double y, double z) {
+        this.vector = new Vector(x, y, z);
+    }
+    
     public Vertex3D(Vector vector) {
         this.vector = vector;
     }

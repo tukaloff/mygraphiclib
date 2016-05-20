@@ -18,20 +18,18 @@ public class Object3D{
     protected ArrayList<Vertex3D> vertexes = new ArrayList<>();
     protected ArrayList<Line3D> lines = new ArrayList<>();
     protected ArrayList<Triangle3D> triangles = new ArrayList<>();
-    private int lx = 0;
-    private int ly = 0;
     protected int distX;
     protected int distY;
     protected Vector basisVector;
-    protected Vector rotation;
+    //protected Vector rotation;
     
     protected double rx = 0;
     protected double ry = 0;
     protected double rz = 0;
     
-    public Object3D(Vector basis, Vector rotation) {
+    public Object3D(Vector basis/*, Vector rotation*/) {
         this.basisVector = basis;
-        this.rotation = rotation;
+        //this.rotation = rotation;
     }
     
     public void add(Vertex3D v)  {
@@ -57,53 +55,49 @@ public class Object3D{
         lines.add(line);
     }
     
+    public void setTriangle(int x1, int x2, int x3) {
+        int vCount = this.vertexes.size();
+        if (x1 >= 0 && x1 < vCount 
+                && x2 >= 0 && x2 < vCount
+                && x3 >= 0 && x3 < vCount) {
+            triangles.add(new Triangle3D(vertexes.get(x1), vertexes.get(x2), vertexes.get(x3)));
+        }
+    }
+    
+    public void addTriangle(Vertex3D v1, Vertex3D v2, Vertex3D v3) {
+        vertexes.add(v1);
+        vertexes.add(v2);
+        vertexes.add(v3);
+        triangles.add(new Triangle3D(v1, v2, v3));
+    }
+    
     public void paintLines(BufferedImage bi) {
         for(Line3D line : lines) {
-            Vector vVec1 = line.getV1().getVector();
-            Vector vVec2 = line.getV2().getVector();
-            //Vector rot1 = Vector.getRotate(rotation,vVec1);
-            Vector rot1 = TransformMatrix.getVectorFtomMatrix(
-                    TransformMatrix.getComplex(
-                            TransformMatrix.getRotationX(rx),
-                            TransformMatrix.getMatrixFromVector(vVec1)
-                    )
-                );
-            rot1 = TransformMatrix.getVectorFtomMatrix(
-                    TransformMatrix.getComplex(
-                            TransformMatrix.getRotationY(ry),
-                            TransformMatrix.getMatrixFromVector(rot1)
-                    )
-                );
-            rot1 = TransformMatrix.getVectorFtomMatrix(
-                    TransformMatrix.getComplex(
-                            TransformMatrix.getRotationZ(rz),
-                            TransformMatrix.getMatrixFromVector(rot1)
-                    )
-                );
-            //Vector rot2 = Vector.getRotate(rotation, vVec2);
-            Vector rot2 = TransformMatrix.getVectorFtomMatrix(
-                    TransformMatrix.getComplex(
-                            TransformMatrix.getRotationX(rx),
-                            TransformMatrix.getMatrixFromVector(vVec2)
-                    )
-                );
-            rot2 = TransformMatrix.getVectorFtomMatrix(
-                    TransformMatrix.getComplex(
-                            TransformMatrix.getRotationY(ry),
-                            TransformMatrix.getMatrixFromVector(rot2)
-                    )
-                );
-            rot2 = TransformMatrix.getVectorFtomMatrix(
-                    TransformMatrix.getComplex(
-                            TransformMatrix.getRotationZ(rz),
-                            TransformMatrix.getMatrixFromVector(rot2)
-                    )
-                );
-            Vector absVector1 = Vector.getSum(basisVector, rot1);
-            Vector absVector2 = Vector.getSum(basisVector, rot2);
-            PerspectiveVertex pv1 = new PerspectiveVertex(absVector1);
-            PerspectiveVertex pv2 = new PerspectiveVertex(absVector2);
-            drawLine((int)pv1.getX(), (int)pv1.getY(), (int)pv2.getX(), (int)pv2.getY(), bi, Color.WHITE.getRGB());
+            transformNDrawLine(line, bi);
+        }
+    }
+    
+    public void transformNDrawLine(Line3D line, BufferedImage bi) {
+        Vector vector1 = getVectorTransform(line.getV1().getVector());
+        Vector vector2 = getVectorTransform(line.getV2().getVector());
+        PerspectiveVertex pv1 = new PerspectiveVertex(vector1);
+        PerspectiveVertex pv2 = new PerspectiveVertex(vector2);
+        drawLine((int)pv1.getX(), (int)pv1.getY(), 
+                (int)pv2.getX(), (int)pv2.getY(), 
+                bi, Color.WHITE.getRGB());
+    }
+    
+    protected Vector getVectorTransform(Vector v) {
+        Vector rot = TransformMatrix.rotate(v, rx, ry, rz);
+        Vector absVector1 = Vector.getSum(basisVector, rot);
+        return absVector1;
+    }
+    
+    public void paintTriangles(BufferedImage bi) {
+        for(Triangle3D tr : triangles) {
+            transformNDrawLine(tr.getLine1(), bi);
+            transformNDrawLine(tr.getLine2(), bi);
+            transformNDrawLine(tr.getLine3(), bi);
         }
     }
     
@@ -111,13 +105,6 @@ public class Object3D{
         this.rx += rx;
         this.ry += ry;
         this.rz += rz;
-        /*
-        if (rx > 0)
-            rotation.rotateX(rx);
-        if (ry > 0)
-            rotation.rotateY(ry);
-        if (rz > 0)
-            rotation.rotateZ(rz);*/
     }
     
     protected void drawLine(int x1, int y1, int x2, int y2, BufferedImage bi, int rgb) {

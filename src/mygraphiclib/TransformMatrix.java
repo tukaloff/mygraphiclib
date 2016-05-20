@@ -104,6 +104,15 @@ public class TransformMatrix {
         return new Vector(m[0][0], m[0][1], m[0][2]);
     }
     
+    public static Vector rotate(Vector v, double rx, double ry, double rz) {
+        Vector rotV = getVectorFtomMatrix(getComplex(getRotationX(rx),
+                getMatrixFromVector(v)));
+        rotV = getVectorFtomMatrix(getComplex(getRotationY(ry),
+                getMatrixFromVector(rotV)));
+        return getVectorFtomMatrix(getComplex(getRotationZ(rz),
+                getMatrixFromVector(rotV)));
+    }
+    
     public static double getXFromMatrix(double[][] m) {
         return m[0][0] + m[1][0] + m[2][0] + m[3][0];
     }
