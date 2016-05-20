@@ -61,10 +61,46 @@ public class Object3D{
         for(Line3D line : lines) {
             Vector vVec1 = line.getV1().getVector();
             Vector vVec2 = line.getV2().getVector();
-            Vector rot1 = Vector.getRotate(vVec1, rotation);
-            Vector rot2 = Vector.getRotate(vVec2, rotation);
-            Vector absVector1 = Vector.getSum(rot1, basisVector);
-            Vector absVector2 = Vector.getSum(rot2, basisVector);
+            //Vector rot1 = Vector.getRotate(rotation,vVec1);
+            Vector rot1 = TransformMatrix.getVectorFtomMatrix(
+                    TransformMatrix.getComplex(
+                            TransformMatrix.getRotationX(rx),
+                            TransformMatrix.getMatrixFromVector(vVec1)
+                    )
+                );
+            rot1 = TransformMatrix.getVectorFtomMatrix(
+                    TransformMatrix.getComplex(
+                            TransformMatrix.getRotationY(ry),
+                            TransformMatrix.getMatrixFromVector(rot1)
+                    )
+                );
+            rot1 = TransformMatrix.getVectorFtomMatrix(
+                    TransformMatrix.getComplex(
+                            TransformMatrix.getRotationZ(rz),
+                            TransformMatrix.getMatrixFromVector(rot1)
+                    )
+                );
+            //Vector rot2 = Vector.getRotate(rotation, vVec2);
+            Vector rot2 = TransformMatrix.getVectorFtomMatrix(
+                    TransformMatrix.getComplex(
+                            TransformMatrix.getRotationX(rx),
+                            TransformMatrix.getMatrixFromVector(vVec2)
+                    )
+                );
+            rot2 = TransformMatrix.getVectorFtomMatrix(
+                    TransformMatrix.getComplex(
+                            TransformMatrix.getRotationY(ry),
+                            TransformMatrix.getMatrixFromVector(rot2)
+                    )
+                );
+            rot2 = TransformMatrix.getVectorFtomMatrix(
+                    TransformMatrix.getComplex(
+                            TransformMatrix.getRotationZ(rz),
+                            TransformMatrix.getMatrixFromVector(rot2)
+                    )
+                );
+            Vector absVector1 = Vector.getSum(basisVector, rot1);
+            Vector absVector2 = Vector.getSum(basisVector, rot2);
             PerspectiveVertex pv1 = new PerspectiveVertex(absVector1);
             PerspectiveVertex pv2 = new PerspectiveVertex(absVector2);
             drawLine((int)pv1.getX(), (int)pv1.getY(), (int)pv2.getX(), (int)pv2.getY(), bi, Color.WHITE.getRGB());
@@ -72,12 +108,16 @@ public class Object3D{
     }
     
     public void rotate(double rx, double ry, double rz) {
+        this.rx += rx;
+        this.ry += ry;
+        this.rz += rz;
+        /*
         if (rx > 0)
             rotation.rotateX(rx);
         if (ry > 0)
             rotation.rotateY(ry);
         if (rz > 0)
-            rotation.rotateZ(rz);
+            rotation.rotateZ(rz);*/
     }
     
     protected void drawLine(int x1, int y1, int x2, int y2, BufferedImage bi, int rgb) {
@@ -101,7 +141,7 @@ public class Object3D{
         }
         for (int x = x1; x <= x2; x++) {
             float t = (x - x1) / (float) (x2 - x1);
-            int y = (int) (y1 * (1.0 - t) + y2 * t);
+            int y = (int) ((y1 + 0.005) * (1.0 - t) + (y2 + 0.005) * t);
             int w = bi.getWidth();
             int h = bi.getHeight();
             if (steep) {

@@ -20,8 +20,8 @@ public class PerspectiveVertex {
         double z3 = vector.getZ();
         //System.out.println(x3 + "/" + y3 + "/" + z3);
         double k = 100;
-        x = (double)(k * x3) / (double)(z3 + k);
-        y = (double)(k * y3) / (double)(z3 + k);
+        x = (k * x3) / z3;
+        y = (k * y3) / z3;
     }
     
     public double getX() {

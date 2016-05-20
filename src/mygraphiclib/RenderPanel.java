@@ -22,7 +22,7 @@ public class RenderPanel extends JPanel {
     
     public RenderPanel() {
         super();
-        model = new Model(new Vector(1, 1, 1));
+        model = new Model(new Vector(0, 0, 400));
         new Thread(new Runnable() {
             @Override
             public void run() {
