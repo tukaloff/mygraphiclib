@@ -19,7 +19,7 @@ public class Model {
     public Model(Vector vector) {
         this.vector = vector;
         //Tetrahedron th = new Tetrahedron(vector);
-        Cube cube = new Cube(vector);
+        Cube cube = new Cube(vector, 50);
         object = cube;
     }
     

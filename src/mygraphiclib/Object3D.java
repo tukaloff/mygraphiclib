@@ -60,7 +60,9 @@ public class Object3D{
         if (x1 >= 0 && x1 < vCount 
                 && x2 >= 0 && x2 < vCount
                 && x3 >= 0 && x3 < vCount) {
-            triangles.add(new Triangle3D(vertexes.get(x1), vertexes.get(x2), vertexes.get(x3)));
+            Triangle3D tr = new Triangle3D(vertexes.get(x1), vertexes.get(x2), vertexes.get(x3));
+            tr.setPaint(Color.WHITE.getRGB());
+            triangles.add(tr);
         }
     }
     
