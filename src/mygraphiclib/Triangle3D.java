@@ -24,6 +24,9 @@ public class Triangle3D {
     private double xDet, yDet, zDet;
     
     public Triangle3D() {
+        int c = Color.BLACK.getRGB();
+        double r = Math.random();
+        this.rgbColor = (int) (c * r);
         v1 = new Vertex3D();
         v2 = new Vertex3D();
         v3 = new Vertex3D();
@@ -84,8 +87,8 @@ public class Triangle3D {
         return l3;
     }
 
-    public Color getColor() {
-        return Color.WHITE;
+    public int getColor() {
+        return rgbColor;
     }
     
     public Vertex3D getUp() {

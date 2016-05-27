@@ -6,8 +6,10 @@
 package mygraphiclib;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  *
@@ -61,7 +63,10 @@ public class Object3D{
                 && x2 >= 0 && x2 < vCount
                 && x3 >= 0 && x3 < vCount) {
             Triangle3D tr = new Triangle3D(vertexes.get(x1), vertexes.get(x2), vertexes.get(x3));
-            tr.setPaint(Color.WHITE.getRGB());
+            int c = Color.BLACK.getRGB();
+            double r = Math.random();
+            int rgbColor = (int) (c * r);
+            tr.setPaint(rgbColor);
             triangles.add(tr);
         }
     }
@@ -86,7 +91,7 @@ public class Object3D{
         PerspectiveVertex pv2 = new PerspectiveVertex(vector2);
         drawLine((int)pv1.getX(), (int)pv1.getY(), 
                 (int)pv2.getX(), (int)pv2.getY(), 
-                bi, Color.WHITE.getRGB());
+                bi, Color.BLACK.getRGB());
     }
     
     protected Vector getVectorTransform(Vector v) {
@@ -96,10 +101,87 @@ public class Object3D{
     }
     
     public void paintTriangles(BufferedImage bi) {
-        for(Triangle3D tr : triangles) {
+        triangles.sort((Triangle3D o1, Triangle3D o2) -> {
+            double avgZ1 = (getVectorTransform(o1.getV1().getVector()).getZ() +
+                    getVectorTransform(o1.getV2().getVector()).getZ() +
+                    getVectorTransform(o1.getV3().getVector()).getZ()) / 3;
+            double avgZ2 = (getVectorTransform(o2.getV1().getVector()).getZ() +
+                    getVectorTransform(o2.getV2().getVector()).getZ() +
+                    getVectorTransform(o2.getV3().getVector()).getZ()) / 3;
+            //avgZ1 = getVectorTransform(o1.getV1().getVector()).getZ();
+            //avgZ2 = getVectorTransform(o2.getV1().getVector()).getZ();
+            return Double.compare(avgZ2, avgZ1);
+        });
+        for(int i = 0; i < triangles.size(); i++) {
+            Triangle3D tr = triangles.get(i);
+            int rgb = tr.getColor();
+            fillTriangle(tr, i, bi, rgb);
+            /*
             transformNDrawLine(tr.getLine1(), bi);
             transformNDrawLine(tr.getLine2(), bi);
             transformNDrawLine(tr.getLine3(), bi);
+            */            
+        }
+    }
+    
+    public void fillTriangle(Triangle3D tr, int num, BufferedImage bi, int rgb) {
+        Vector v1 = getVectorTransform(tr.getV1().getVector());
+        Vector v2 = getVectorTransform(tr.getV2().getVector());
+        Vector v3 = getVectorTransform(tr.getV3().getVector());
+        Graphics2D g2 = ((Graphics2D)(bi.getGraphics()));
+        g2.setColor(new Color(rgb));
+        String s1 = num + ": v1(" + (int)v1.getX() + "; " + (int)v1.getY() + "; " + (int)v1.getZ() + ")";
+        g2.drawString(s1, 10, 10 + num * 20);
+        String s2 = num + ": v2(" + (int)v2.getX() + "; " + (int)v2.getY() + "; " + (int)v2.getZ() + ")";
+        g2.drawString(s2, 150, 10 + num * 20);
+        String s3 = num + ": v3(" + (int)v3.getX() + "; " + (int)v3.getY() + "; " + (int)v3.getZ() + ")";
+        g2.drawString(s3, 300, 10 + num * 20);
+        PerspectiveVertex pv1 = new PerspectiveVertex(v1);
+        PerspectiveVertex pv2 = new PerspectiveVertex(v2);
+        PerspectiveVertex pv3 = new PerspectiveVertex(v3);
+        PerspectiveVertex pvBuffer = pv1;
+        if (pv1.getY() > pv2.getY()) {
+            pvBuffer = pv1;
+            pv1 = pv2;
+            pv2 = pvBuffer;
+        }
+        if (pv1.getY() > pv3.getY()) {
+            pvBuffer = pv1;
+            pv1 = pv3;
+            pv3 = pvBuffer;
+        }
+        if (pv2.getY() > pv3.getY()) {
+            pvBuffer = pv2;
+            pv2 = pv3;
+            pv3 = pvBuffer;
+        }
+        int totalHeight = (int) (pv3.getY() - pv1.getY());
+        for (int i = 0; i < totalHeight; i++) {
+            boolean secondHalf = i > pv2.getY() - pv1.getY() || 
+                    pv2.getY() == pv1.getY();
+            int segmentHeight = (int) (secondHalf ? pv3.getY() - pv2.getY() :
+                    pv2.getY() - pv1.getY());
+            float alpha = (float)i / totalHeight;
+            float beta = (float)(i - (secondHalf ? pv2.getY() - pv1.getY():0)) / segmentHeight;
+            int ax = (int) (pv1.getX() + alpha * (pv3.getX() - pv1.getX()));
+            int ay = (int) (pv1.getY() + alpha * (pv3.getY() - pv1.getY()));
+            int bx = (int) (secondHalf ? (pv2.getX() + beta * (pv3.getX() - pv2.getX())) :
+                    (pv1.getX() + beta * (pv2.getX() - pv1.getX())));
+            int by = (int) (secondHalf ? (pv2.getY() + beta * (pv3.getY() - pv2.getY())) :
+                    (pv1.getY() + beta * (pv2.getY() - pv1.getY())));
+            if (ax > bx) {
+                int tmp = ax;
+                ax = bx;
+                bx = tmp;
+                tmp = ay;
+                ay = by;
+                by = tmp;
+            }
+            int w = bi.getWidth();
+            int h = bi.getHeight();
+            for (int j = ax; j <= bx; j++) {
+                bi.setRGB(j + w / 2, (int) (h - (pv1.getY() + i + h / 2) + 0.5), rgb);
+            }
         }
     }
     
