@@ -8,6 +8,8 @@ package mygraphiclib;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.TexturePaint;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.logging.Level;
@@ -50,8 +52,10 @@ public class RenderPanel extends JPanel {
         
         ri.setModel(model);
         ri.paint();
-        g2.setPaint(new TexturePaint(ri.getBufferedImage(), g.getClipBounds()));
-        g2.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
+        if(ri.isFinished()) {
+            g2.setPaint(new TexturePaint(ri.getBufferedImage(), g.getClipBounds()));
+            g2.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
+        }
     }
     
     private void initListeners() {
@@ -79,5 +83,33 @@ public class RenderPanel extends JPanel {
                 //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
+        
+        this.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                //System.out.println("keyTyped: " + e.getKeyCode() + ": " + e.getKeyChar());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                //System.out.println("keyPressed: " + e.getKeyCode() + ": " + e.getKeyChar());
+                switch (e.getKeyCode()) {
+                    case 107:
+                        Preferences.setDistance(Preferences.getDistance() + 2);
+                        break;
+                    case 109:
+                        Preferences.setDistance(Preferences.getDistance() - 2);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                //System.out.println("keyReleased: " + e.getKeyCode() + ": " + e.getKeyChar());
+            }
+        });
+        
     }
 }

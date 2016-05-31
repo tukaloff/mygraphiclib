@@ -25,7 +25,7 @@ public class Tetrahedron extends Object3D{
         super.addTriangle(v2, v3, v1);
     }
     
-    public void paint(BufferedImage bi) {
-        super.paintTriangles(bi);
+    public void paint(BufferedImage bi, Light light) {
+        super.paintTriangles(bi, light);
     }
 }

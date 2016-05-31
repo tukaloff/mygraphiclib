@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  *
@@ -66,6 +65,7 @@ public class Object3D{
             int c = Color.BLACK.getRGB();
             double r = Math.random();
             int rgbColor = (int) (c * r);
+            rgbColor = Color.WHITE.getRGB();
             tr.setPaint(rgbColor);
             triangles.add(tr);
         }
@@ -97,34 +97,50 @@ public class Object3D{
     protected Vector getVectorTransform(Vector v) {
         Vector rot = TransformMatrix.rotate(v, rx, ry, rz);
         Vector absVector1 = Vector.getSum(basisVector, rot);
+        //System.out.println(absVector1.toString());
         return absVector1;
     }
     
-    public void paintTriangles(BufferedImage bi) {
-        triangles.sort((Triangle3D o1, Triangle3D o2) -> {
-            double avgZ1 = (getVectorTransform(o1.getV1().getVector()).getZ() +
-                    getVectorTransform(o1.getV2().getVector()).getZ() +
-                    getVectorTransform(o1.getV3().getVector()).getZ()) / 3;
-            double avgZ2 = (getVectorTransform(o2.getV1().getVector()).getZ() +
-                    getVectorTransform(o2.getV2().getVector()).getZ() +
-                    getVectorTransform(o2.getV3().getVector()).getZ()) / 3;
-            //avgZ1 = getVectorTransform(o1.getV1().getVector()).getZ();
-            //avgZ2 = getVectorTransform(o2.getV1().getVector()).getZ();
-            return Double.compare(avgZ2, avgZ1);
+    public void paintTriangles(BufferedImage bi, Light light) {
+        triangles.sort((Triangle3D o1, Triangle3D o2) -> {            
+            double comp = (getVectorTransform(o1.getV1().getVector()).getZ() - getVectorTransform(o2.getV1().getVector()).getZ())
+                    + (getVectorTransform(o1.getV2().getVector()).getZ() - getVectorTransform(o2.getV2().getVector()).getZ())
+                    + (getVectorTransform(o1.getV3().getVector()).getZ() - getVectorTransform(o2.getV3().getVector()).getZ());
+            return Double.compare(0, comp);
         });
         for(int i = 0; i < triangles.size(); i++) {
             Triangle3D tr = triangles.get(i);
             int rgb = tr.getColor();
-            fillTriangle(tr, i, bi, rgb);
-            /*
+            Color color = new Color(rgb);
+            Vector normal = tr.getNormal(false);
+            Vector rotNorm = TransformMatrix.rotate(normal, rx, ry, rz);
+            Vector nNorm = (getVectorTransform(normal)).normalize();
+            if (rotNorm.getZ() < 0) {
+                normal = tr.getNormal(true);
+                nNorm = (getVectorTransform(normal)).normalize();
+            }
+            //System.out.println(normal);
+            double brightness = Vector.getScalar(light.getDirection().normalize(), 
+                    nNorm);
+            brightness = brightness < 0 ? 0 : brightness;
+            //System.out.println(brightness);
+            int newRgb = (new Color((int)(color.getRed() * brightness * light.getIntensity()), 
+                    (int)(color.getRed() * brightness * light.getIntensity()), 
+                    (int)(color.getRed() * brightness * light.getIntensity()))).getRGB();
+            fillTriangle(tr, i, bi, newRgb);
+            
             transformNDrawLine(tr.getLine1(), bi);
             transformNDrawLine(tr.getLine2(), bi);
             transformNDrawLine(tr.getLine3(), bi);
-            */            
+            
         }
     }
     
     public void fillTriangle(Triangle3D tr, int num, BufferedImage bi, int rgb) {
+        int w = bi.getWidth();
+        int h = bi.getHeight();
+        int halfW = w / 2;
+        int halfH = h / 2;
         Vector v1 = getVectorTransform(tr.getV1().getVector());
         Vector v2 = getVectorTransform(tr.getV2().getVector());
         Vector v3 = getVectorTransform(tr.getV3().getVector());
@@ -177,10 +193,11 @@ public class Object3D{
                 ay = by;
                 by = tmp;
             }
-            int w = bi.getWidth();
-            int h = bi.getHeight();
             for (int j = ax; j <= bx; j++) {
-                bi.setRGB(j + w / 2, (int) (h - (pv1.getY() + i + h / 2) + 0.5), rgb);
+                int xCor = j + halfW;
+                int yCor = (int) (h - (pv1.getY() + i + halfH) + 0.5);
+                if (!(xCor < 0 || xCor >= w || yCor < 0 || yCor >= h))
+                    bi.setRGB(xCor, yCor, rgb);
             }
         }
     }
@@ -193,6 +210,10 @@ public class Object3D{
     
     protected void drawLine(int x1, int y1, int x2, int y2, BufferedImage bi, int rgb) {
         boolean steep = false;
+        int w = bi.getWidth();
+        int h = bi.getHeight();
+        int halfW = w / 2;
+        int halfH = h / 2;
         if (Math.abs(x2 - x1) < Math.abs(y2 - y1)) {
             int tmp = x1;
             x1 = y1;
@@ -210,19 +231,18 @@ public class Object3D{
             y1 = y2;
             y2 = tmp;
         }
+        float d = (float) 1 / (x2 - x1);
         for (int x = x1; x <= x2; x++) {
-            float t = (x - x1) / (float) (x2 - x1);
+            float t = (x - x1) * d;
             int y = (int) ((y1 + 0.005) * (1.0 - t) + (y2 + 0.005) * t);
-            int w = bi.getWidth();
-            int h = bi.getHeight();
             if (steep) {
-                int rx = w / 2 + y;
-                int ry = h - (h / 2 + x);
+                int rx = halfW + y;
+                int ry = h - (halfH + x);
                 if (!(rx < 0 || rx >= w || ry < 0 || ry >= h))
                     bi.setRGB(rx, ry, rgb);
             } else {
-                int rx = w / 2 + x;
-                int ry = h - (h / 2 + y);
+                int rx = halfW + x;
+                int ry = h - (halfH + y);
                 if (!(rx < 0 || rx >= w || ry < 0 || ry >= h))
                     bi.setRGB(rx, ry, rgb);
             }

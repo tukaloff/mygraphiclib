@@ -15,11 +15,14 @@ public class Model {
     
     private Object3D object;
     private Vector vector;
+    private Light light;
+    private boolean finished = false;
     
     public Model(Vector vector) {
         this.vector = vector;
         //Tetrahedron th = new Tetrahedron(vector);
         Cube cube = new Cube(vector, 100);
+        light = new Light();
         object = cube;
     }
     
@@ -28,18 +31,24 @@ public class Model {
     }
     
     public void paint(BufferedImage bi) {
+        finished = false;
         switch(object.getClass().getSimpleName()) {
             case "Tetrahedron": {
-                ((Tetrahedron)object).paint(bi);
+                ((Tetrahedron)object).paint(bi, light);
                 break;
             }
             case "Cube": {
-                ((Cube)object).paint(bi);
+                ((Cube)object).paint(bi, light);
                 break;
             }
             default:
                 System.out.println(object.getClass().getName());
         }
+        finished = true;
+    }
+    
+    public boolean isFinished() {
+        return finished;
     }
     
     public Vector getVector() {

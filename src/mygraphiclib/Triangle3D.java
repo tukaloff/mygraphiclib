@@ -43,6 +43,20 @@ public class Triangle3D {
         l2 = new Line3D(v1, v3);
         l3 = new Line3D(v2, v3);
     }
+    
+    public Vector getNormal(boolean invert) {
+        Vector a = new Vector(v2.getX() - v1.getX(), 
+                        v2.getY() - v1.getY(), 
+                        v2.getZ() - v1.getZ());
+        Vector b = new Vector(v3.getX() - v1.getX(), 
+                        v3.getY() - v1.getY(), 
+                        v3.getZ() - v1.getZ());
+        Vector n = Vector.getMultiple(a, b);
+        if (invert)
+            n = Vector.getMultiple(b, a);
+        return n;
+    }
+    
     /*
     public double getPerimeter() {
         return l1.getLenght() + l2.getLenght() + l3.getLenght();

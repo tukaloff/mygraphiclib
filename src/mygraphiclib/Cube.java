@@ -60,8 +60,8 @@ public class Cube extends Object3D{
         super.setTriangle(7, 6, 4);
     }
 
-    public void paint(BufferedImage bi) {
+    public void paint(BufferedImage bi, Light light) {
         //super.paintLines(bi);
-        super.paintTriangles(bi);
+        super.paintTriangles(bi, light);
     }
 }

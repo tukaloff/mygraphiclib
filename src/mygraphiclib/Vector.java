@@ -90,4 +90,35 @@ public class Vector {
                 vector1.getY() * vector2.getY(), 
                 vector1.getZ() * vector2.getZ());
     }
+    
+    public static Vector getMultiple(Vector vector1, Vector vector2) {
+        //a × b = {aybz - azby; azbx - axbz; axby - aybx}
+        return new Vector(vector1.getY() * vector2.getZ() - 
+                vector1.getZ() * vector2.getY(), 
+                vector1.getZ() * vector2.getX() - 
+                vector1.getX() * vector2.getZ(), 
+                vector1.getX() * vector2.getY() - 
+                vector1.getY() * vector2.getX());
+    }
+    
+    public static double getScalar(Vector vector1, Vector vector2) {
+        //a · b = ax · bx + ay · by + az · bz
+        return vector1.getX() * vector2.getX() +
+                vector1.getY() * vector2.getY() +
+                vector1.getZ() * vector2.getZ();
+    }
+    
+    @Override
+    public String toString() {
+        return (getClass().getSimpleName() + 
+                ": (" + getX() + "; " + getY() + "; " + getZ() + ")");
+    }
+    
+    public Vector normalize() {
+        double max = 1.0 / Math.sqrt(x * x + y * y + z * z);
+        x *= max;
+        y *= max;
+        z *= max;
+        return this;
+    }
 }

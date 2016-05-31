@@ -33,7 +33,8 @@ public class RenderedImage {
     public RenderedImage(int width, int height) {
         this.bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = this.bi.getGraphics();
-        g.setColor(Color.DARK_GRAY);
+        //g.setColor(Color.DARK_GRAY);
+        g.setColor(Color.BLACK);
         g.fillRect(0, 0, width, height);
     }
     
@@ -47,5 +48,9 @@ public class RenderedImage {
     
     public BufferedImage getBufferedImage() {
         return bi;
+    }
+    
+    public boolean isFinished() {
+        return model.isFinished();
     }
 }

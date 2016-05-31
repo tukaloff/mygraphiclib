@@ -19,7 +19,7 @@ public class PerspectiveVertex {
         double y3 = vector.getY();
         double z3 = vector.getZ();
         //System.out.println(x3 + "/" + y3 + "/" + z3);
-        double k = 500;
+        double k = Preferences.getDistance();
         x = (k * x3) / z3;
         y = (k * y3) / z3;
     }

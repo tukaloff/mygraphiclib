@@ -51,4 +51,10 @@ public class Line3D {
                 + Math.pow((y2 - y1), 2)
                 + Math.pow((z2 - z1), 2));
     }
+    
+    public Vector getVector() {
+        return new Vector(v2.getX() - v1.getX(),
+            v2.getY() - v1.getY(),
+            v2.getZ() - v1.getZ());
+    }
 }
