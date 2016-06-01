@@ -28,6 +28,8 @@ public class Object3D{
     protected double ry = 0;
     protected double rz = 0;
     
+    private double[][] zBuffer;
+    
     public Object3D(Vector basis/*, Vector rotation*/) {
         this.basisVector = basis;
         //this.rotation = rotation;
@@ -63,8 +65,8 @@ public class Object3D{
                 && x3 >= 0 && x3 < vCount) {
             Triangle3D tr = new Triangle3D(vertexes.get(x1), vertexes.get(x2), vertexes.get(x3));
             int c = Color.BLACK.getRGB();
-            double r = Math.random();
-            int rgbColor = (int) (c * r);
+            //double r = Math.random();
+            int rgbColor = 0;//(int) (c * r);
             rgbColor = Color.WHITE.getRGB();
             tr.setPaint(rgbColor);
             triangles.add(tr);
@@ -102,12 +104,19 @@ public class Object3D{
     }
     
     public void paintTriangles(BufferedImage bi, Light light) {
+        zBuffer = new double[bi.getWidth()][bi.getHeight()];
+        for(int i = 0; i < zBuffer.length; i++) {
+            for (int j = 0; j < zBuffer[i].length; j++)
+                zBuffer[i][j] = Integer.MAX_VALUE;
+        }
+        /*
         triangles.sort((Triangle3D o1, Triangle3D o2) -> {            
             double comp = (getVectorTransform(o1.getV1().getVector()).getZ() - getVectorTransform(o2.getV1().getVector()).getZ())
                     + (getVectorTransform(o1.getV2().getVector()).getZ() - getVectorTransform(o2.getV2().getVector()).getZ())
                     + (getVectorTransform(o1.getV3().getVector()).getZ() - getVectorTransform(o2.getV3().getVector()).getZ());
             return Double.compare(0, comp);
         });
+        */
         for(int i = 0; i < triangles.size(); i++) {
             Triangle3D tr = triangles.get(i);
             int rgb = tr.getColor();
@@ -127,16 +136,18 @@ public class Object3D{
             int newRgb = (new Color((int)(color.getRed() * brightness * light.getIntensity()), 
                     (int)(color.getRed() * brightness * light.getIntensity()), 
                     (int)(color.getRed() * brightness * light.getIntensity()))).getRGB();
-            fillTriangle(tr, i, bi, newRgb);
-            
+            if (brightness > 0) {
+                fillTriangle(tr, i, bi, newRgb, light);
+            }
+            /*
             transformNDrawLine(tr.getLine1(), bi);
             transformNDrawLine(tr.getLine2(), bi);
             transformNDrawLine(tr.getLine3(), bi);
-            
+            */
         }
     }
     
-    public void fillTriangle(Triangle3D tr, int num, BufferedImage bi, int rgb) {
+    public void fillTriangle(Triangle3D tr, int num, BufferedImage bi, int rgb, Light light) {
         int w = bi.getWidth();
         int h = bi.getHeight();
         int halfW = w / 2;
@@ -179,25 +190,51 @@ public class Object3D{
                     pv2.getY() - pv1.getY());
             float alpha = (float)i / totalHeight;
             float beta = (float)(i - (secondHalf ? pv2.getY() - pv1.getY():0)) / segmentHeight;
-            int ax = (int) (pv1.getX() + alpha * (pv3.getX() - pv1.getX()));
-            int ay = (int) (pv1.getY() + alpha * (pv3.getY() - pv1.getY()));
-            int bx = (int) (secondHalf ? (pv2.getX() + beta * (pv3.getX() - pv2.getX())) :
-                    (pv1.getX() + beta * (pv2.getX() - pv1.getX())));
-            int by = (int) (secondHalf ? (pv2.getY() + beta * (pv3.getY() - pv2.getY())) :
-                    (pv1.getY() + beta * (pv2.getY() - pv1.getY())));
-            if (ax > bx) {
-                int tmp = ax;
-                ax = bx;
-                bx = tmp;
-                tmp = ay;
-                ay = by;
-                by = tmp;
+            Vector a = Vector.getSum(pv1.getVector(), 
+                    Vector.getMultForNum(Vector.getDiff(pv3.getVector(), 
+                            pv1.getVector()), alpha));
+            Vector b = secondHalf ? (Vector.getSum(pv2.getVector(), Vector.getMultForNum(Vector.getDiff(pv3.getVector(), pv2.getVector()), beta))) :
+                    (Vector.getSum(pv1.getVector(), Vector.getMultForNum(Vector.getDiff(pv2.getVector(), pv1.getVector()), beta)));
+            if (a.getX() > b.getX()) {
+                Vector tmp = a;
+                a = b;
+                b = tmp;
             }
-            for (int j = ax; j <= bx; j++) {
+            for (int j = (int) a.getX(); j <= b.getX(); j++) {
+                double phi = a.getX() == b.getX() ? 1. : (double)(j-a.getX())/(double)(b.getX()-a.getX());
+                Vector p = Vector.getSum(a, Vector.getMultForNum(Vector.getDiff(b, a), phi));
                 int xCor = j + halfW;
-                int yCor = (int) (h - (pv1.getY() + i + halfH) + 0.5);
-                if (!(xCor < 0 || xCor >= w || yCor < 0 || yCor >= h))
-                    bi.setRGB(xCor, yCor, rgb);
+                int yCor = (int)(h - ((int)(p.getY() + 0.5) + halfH));
+                if (!(xCor < 0 || xCor >= w || yCor < 0 || yCor >= h)) {
+                    if (zBuffer[xCor][yCor] > p.getZ()) {
+                        Color color = new Color(rgb);
+                        double lDist = (light.getLocation().getZ() + light.getDistance() - p.getZ()) / light.getDistance();
+                        lDist = lDist < 0 ? 0 : lDist;
+                        //System.out.println(lDist);
+                        int newRGB = (new Color((int)(color.getRed() * lDist),
+                            (int)(color.getGreen()* lDist),
+                            (int)(color.getBlue()* lDist))).getRGB();
+                        zBuffer[xCor][yCor] = p.getZ();
+                        bi.setRGB(xCor, yCor, newRGB);
+                    }
+                }
+//                int xCor = j + halfW;
+//                int diffZ = az - bz == 0 ? 0 : 1 / (bz - az);
+//                double zb = (int)(az + diffZ * (j - ax) + 0.5);
+//                int yCor = (int) (h - (pv1.getY() + i + halfH) + 0.5);
+//                if (!(xCor < 0 || xCor >= w || yCor < 0 || yCor >= h)) {
+//                    if (zBuffer[xCor][yCor] > zb/* && zBuffer[xCor][yCor] == Integer.MAX_VALUE*/) {
+//                        Color color = new Color(rgb);
+//                        double lDist = (light.getLocation().getZ() + light.getDistance() - zb) / light.getDistance();
+//                        lDist = lDist < 0 ? 0 : lDist;
+//                        //System.out.println(lDist);
+//                        int newRGB = (new Color((int)(color.getRed() * lDist),
+//                            (int)(color.getGreen()* lDist),
+//                            (int)(color.getBlue()* lDist))).getRGB();
+//                        zBuffer[xCor][yCor] = zb;
+//                        bi.setRGB(xCor, yCor, newRGB);
+//                    }
+//                }
             }
         }
     }

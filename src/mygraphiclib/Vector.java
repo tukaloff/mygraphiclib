@@ -75,6 +75,20 @@ public class Vector {
                 vector1.getY() + vector2.getY(), 
                 vector1.getZ() + vector2.getZ());
     }
+    
+    public static Vector getDiff(Vector vector1, Vector vector2) {
+        return new Vector(
+                vector1.getX() - vector2.getX(), 
+                vector1.getY() - vector2.getY(), 
+                vector1.getZ() - vector2.getZ());
+    }
+    
+    public static Vector getMultForNum(Vector vector1, double num) {
+        return new Vector(
+                vector1.getX() * num, 
+                vector1.getY() * num, 
+                vector1.getZ() * num);
+    }
     /*
     public static Vector getRotate(Vector vector1, Vector vector2) {
         return new Vector(

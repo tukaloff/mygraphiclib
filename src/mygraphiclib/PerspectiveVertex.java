@@ -13,6 +13,7 @@ public class PerspectiveVertex {
     
     private double x;
     private double y;
+    private double z;
     
     public PerspectiveVertex(Vector vector) {
         double x3 = vector.getX();
@@ -22,6 +23,7 @@ public class PerspectiveVertex {
         double k = Preferences.getDistance();
         x = (k * x3) / z3;
         y = (k * y3) / z3;
+        z = z3;
     }
     
     public double getX() {
@@ -30,5 +32,13 @@ public class PerspectiveVertex {
     
     public double getY() {
         return y;
+    }
+    
+    public double getZ() {
+        return z;
+    }
+    
+    public Vector getVector() {
+        return new Vector(x, y, z);
     }
 }

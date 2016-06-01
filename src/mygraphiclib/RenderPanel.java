@@ -5,6 +5,7 @@
  */
 package mygraphiclib;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.TexturePaint;
@@ -12,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
@@ -24,6 +26,8 @@ public class RenderPanel extends JPanel {
     
     Model model;
     int lastX, lastY, diffX, diffY;
+    private int time;
+    private int fps = 30;
     
     public RenderPanel() {
         super();
@@ -33,7 +37,8 @@ public class RenderPanel extends JPanel {
             public void run() {
                 while(true) {
                     try {
-                        Thread.sleep(100);
+                        if (1000 / fps - time > 0)
+                            Thread.sleep((int)(1000 / fps - time));
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RenderPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -48,14 +53,18 @@ public class RenderPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        long startTime = new GregorianCalendar().getTimeInMillis();
         RenderedImage ri = new RenderedImage(g.getClipBounds().width, g.getClipBounds().height);
-        
         ri.setModel(model);
         ri.paint();
         if(ri.isFinished()) {
             g2.setPaint(new TexturePaint(ri.getBufferedImage(), g.getClipBounds()));
             g2.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
         }
+        long endTime = new GregorianCalendar().getTimeInMillis();
+        time = (int) (endTime - startTime);
+        g2.setPaint(Color.WHITE);
+        g2.drawString("Max FPS: " + 1000 / time, g.getClipBounds().width - 70, 20);
     }
     
     private void initListeners() {
