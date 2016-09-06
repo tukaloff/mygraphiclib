@@ -5,7 +5,15 @@
  */
 package mygraphiclib;
 
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -45,19 +53,33 @@ public class Cube extends Object3D{
         super.setLine(4, 5);
         super.setLine(5, 7);
         super.setLine(6, 7);*/
-        super.setTriangle(0, 1, 2);
-        super.setTriangle(0, 3, 2);
-        super.setTriangle(0, 3, 5);
-        super.setTriangle(0, 4, 5);
-        super.setTriangle(0, 3, 5);
-        super.setTriangle(0, 1, 6);
-        super.setTriangle(0, 4, 6);
-        super.setTriangle(7, 2, 3);
-        super.setTriangle(7, 5, 3);
-        super.setTriangle(7, 2, 1);
-        super.setTriangle(7, 6, 1);
-        super.setTriangle(7, 5, 4);
-        super.setTriangle(7, 6, 4);
+        Image img = Toolkit.getDefaultToolkit().getImage("F://texture.jpg").getScaledInstance(100, 100, Image.SCALE_FAST);
+        try {
+            img = ImageIO.read(new File("F://texture.jpg"));
+        } catch (IOException ex) {
+            Logger.getLogger(Cube.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        bi.createGraphics().drawImage(img, 0, 0, null);
+        int[][] image = new int[bi.getWidth()][bi.getHeight()];
+        for (int i = 0; i < image.length; i++) {
+            for (int j = 0; j < image[i].length; j++) {
+                image[i][j] = bi.getRGB(image.length - 1 - i, image[i].length - 1 - j);
+            }
+        }
+        super.setTriangle(0, 1, 2, image);
+        super.setTriangle(0, 3, 2, image);
+        super.setTriangle(0, 3, 5, image);
+        super.setTriangle(0, 4, 5, image);
+        super.setTriangle(0, 3, 5, image);
+        super.setTriangle(0, 1, 6, image);
+        super.setTriangle(0, 4, 6, image);
+        super.setTriangle(7, 2, 3, image);
+        super.setTriangle(7, 5, 3, image);
+        super.setTriangle(7, 2, 1, image);
+        super.setTriangle(7, 6, 1, image);
+        super.setTriangle(7, 5, 4, image);
+        super.setTriangle(7, 6, 4, image);
     }
 
     public void paint(BufferedImage bi, Light light) {

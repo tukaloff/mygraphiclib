@@ -20,6 +20,8 @@ public class Triangle3D {
     private Line3D l2;
     private Line3D l3;
     private int rgbColor;
+    private int [][] texture;
+    private Vector normal;
     
     private double xDet, yDet, zDet;
     
@@ -73,8 +75,40 @@ public class Triangle3D {
         this.rgbColor = color;
     }
     
-    public Color getPaint() {
-        return new Color(rgbColor);
+    public void setPaint(int[][] texture) {
+        this.texture = texture;
+    }
+    
+    public int[][] getPaint() {
+        return texture;
+    }
+    
+    public int getRGBTexture(double u, double v) {
+        u = u > 1.0 ? 1.0 : u;
+        u = u < 0.0 ? 0.0 : u;
+        v = v > 1.0 ? 1.0 : v;
+        v = v < 0.0 ? 0.0 : v;
+        /*Vector normal = this.getNormal(false);
+        if (normal.getZ() < 0)
+            normal = this.getNormal(true);*/
+        //int x = (int)(0.5 + v1.getX() + u * (v2.getX() - v1.getX()) + v * (v3.getX() - v1.getX()));
+        //int y = (int)(0.5 + v1.getY() + u * (v2.getY() - v1.getY()) + v * (v3.getY() - v1.getY()));
+        double dx = Math.abs(normal.getX() / normal.getZ());
+        double dy = Math.abs(normal.getY() / normal.getZ());
+        /*if (dx > 1 || dy > 1)
+            return Color.BLACK.getRGB();*/
+        int x = (int)((texture.length - 1) * u);
+        int y = (int)((texture[x].length - 1) * v);
+        //System.out.println(u + ": " + v + " - " + x + ": " + y);
+        /*
+        if (texture[x][y] == 0) {
+            System.out.println("there");
+        }*/
+        return texture[x][y];
+    }
+    
+    public void giveNormal(Vector normal) {
+        this.normal = normal.normalize();
     }
     
     public Vertex3D getV1() {

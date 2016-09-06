@@ -6,6 +6,8 @@
 package mygraphiclib;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  *
@@ -13,7 +15,7 @@ import java.awt.image.BufferedImage;
  */
 public class Model {
     
-    private Object3D object;
+    private ArrayList<Object3D> object = new ArrayList<>();
     private Vector vector;
     private Light light;
     private boolean finished = false;
@@ -23,27 +25,36 @@ public class Model {
         //Tetrahedron th = new Tetrahedron(vector);
         Cube cube = new Cube(vector, 100);
         light = new Light();
-        object = cube;
+        object.add(cube);/*
+        object.add(new Cube(new Vector(200, 200, 500), 50));
+        object.add(new Cube(new Vector(0, 200, 500), 50));
+        object.add(new Cube(new Vector(-200, 200, 500), 50));*/
+        
+        object.sort((Object3D o1, Object3D o2) -> {
+            double comp = o1.getLocation().getZ() - o1.getLocation().getZ();
+            return Double.compare(comp, 0);
+        });
     }
     
     public Object3D getDraw() {
-        return object;
+        return object.get(0);
     }
     
     public void paint(BufferedImage bi) {
         finished = false;
-        switch(object.getClass().getSimpleName()) {
-            case "Tetrahedron": {
-                ((Tetrahedron)object).paint(bi, light);
-                break;
+        for (int i = 0; i < object.size(); i++)
+            switch(object.get(i).getClass().getSimpleName()) {
+                case "Tetrahedron": {
+                    ((Tetrahedron)(object.get(i))).paint(bi, light);
+                    break;
+                }
+                case "Cube": {
+                    ((Cube)(object.get(i))).paint(bi, light);
+                    break;
+                }
+                default:
+                    System.out.println(object.getClass().getName());
             }
-            case "Cube": {
-                ((Cube)object).paint(bi, light);
-                break;
-            }
-            default:
-                System.out.println(object.getClass().getName());
-        }
         finished = true;
     }
     

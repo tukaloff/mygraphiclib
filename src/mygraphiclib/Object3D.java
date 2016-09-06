@@ -58,17 +58,13 @@ public class Object3D{
         lines.add(line);
     }
     
-    public void setTriangle(int x1, int x2, int x3) {
+    public void setTriangle(int x1, int x2, int x3, int[][] image) {
         int vCount = this.vertexes.size();
         if (x1 >= 0 && x1 < vCount 
                 && x2 >= 0 && x2 < vCount
                 && x3 >= 0 && x3 < vCount) {
             Triangle3D tr = new Triangle3D(vertexes.get(x1), vertexes.get(x2), vertexes.get(x3));
-            int c = Color.BLACK.getRGB();
-            //double r = Math.random();
-            int rgbColor = 0;//(int) (c * r);
-            rgbColor = Color.WHITE.getRGB();
-            tr.setPaint(rgbColor);
+            tr.setPaint(image);
             triangles.add(tr);
         }
     }
@@ -103,6 +99,10 @@ public class Object3D{
         return absVector1;
     }
     
+    public Vector getLocation() {
+        return this.basisVector;
+    }
+    
     public void paintTriangles(BufferedImage bi, Light light) {
         zBuffer = new double[bi.getWidth()][bi.getHeight()];
         for(int i = 0; i < zBuffer.length; i++) {
@@ -120,7 +120,6 @@ public class Object3D{
         for(int i = 0; i < triangles.size(); i++) {
             Triangle3D tr = triangles.get(i);
             int rgb = tr.getColor();
-            Color color = new Color(rgb);
             Vector normal = tr.getNormal(false);
             Vector rotNorm = TransformMatrix.rotate(normal, rx, ry, rz);
             Vector nNorm = (getVectorTransform(normal)).normalize();
@@ -128,16 +127,14 @@ public class Object3D{
                 normal = tr.getNormal(true);
                 nNorm = (getVectorTransform(normal)).normalize();
             }
+            tr.giveNormal(nNorm);
             //System.out.println(normal);
             double brightness = Vector.getScalar(light.getDirection().normalize(), 
                     nNorm);
             brightness = brightness < 0 ? 0 : brightness;
-            //System.out.println(brightness);
-            int newRgb = (new Color((int)(color.getRed() * brightness * light.getIntensity()), 
-                    (int)(color.getRed() * brightness * light.getIntensity()), 
-                    (int)(color.getRed() * brightness * light.getIntensity()))).getRGB();
+            brightness *= light.getIntensity();
             if (brightness > 0) {
-                fillTriangle(tr, i, bi, newRgb, light);
+                fillTriangle(tr, i, bi, rgb, light, brightness);
             }
             /*
             transformNDrawLine(tr.getLine1(), bi);
@@ -147,22 +144,22 @@ public class Object3D{
         }
     }
     
-    public void fillTriangle(Triangle3D tr, int num, BufferedImage bi, int rgb, Light light) {
+    public void fillTriangle(Triangle3D tr, int num, BufferedImage bi, int rgb, Light light, double brightness) {
         int w = bi.getWidth();
         int h = bi.getHeight();
-        int halfW = w / 2;
-        int halfH = h / 2;
+        int halfW = (int)(0.5 + w / 2);
+        int halfH = (int)(0.5 + h / 2);
         Vector v1 = getVectorTransform(tr.getV1().getVector());
         Vector v2 = getVectorTransform(tr.getV2().getVector());
         Vector v3 = getVectorTransform(tr.getV3().getVector());
         Graphics2D g2 = ((Graphics2D)(bi.getGraphics()));
-        g2.setColor(new Color(rgb));
+        /*g2.setColor(new Color(rgb));
         String s1 = num + ": v1(" + (int)v1.getX() + "; " + (int)v1.getY() + "; " + (int)v1.getZ() + ")";
         g2.drawString(s1, 10, 10 + num * 20);
         String s2 = num + ": v2(" + (int)v2.getX() + "; " + (int)v2.getY() + "; " + (int)v2.getZ() + ")";
         g2.drawString(s2, 150, 10 + num * 20);
         String s3 = num + ": v3(" + (int)v3.getX() + "; " + (int)v3.getY() + "; " + (int)v3.getZ() + ")";
-        g2.drawString(s3, 300, 10 + num * 20);
+        g2.drawString(s3, 300, 10 + num * 20);*/
         PerspectiveVertex pv1 = new PerspectiveVertex(v1);
         PerspectiveVertex pv2 = new PerspectiveVertex(v2);
         PerspectiveVertex pv3 = new PerspectiveVertex(v3);
@@ -186,55 +183,70 @@ public class Object3D{
         for (int i = 0; i < totalHeight; i++) {
             boolean secondHalf = i > pv2.getY() - pv1.getY() || 
                     pv2.getY() == pv1.getY();
-            int segmentHeight = (int) (secondHalf ? pv3.getY() - pv2.getY() :
-                    pv2.getY() - pv1.getY());
+            int segmentHeight = (int)(0.5 + (secondHalf ? pv3.getY() - pv2.getY() :
+                    pv2.getY() - pv1.getY()));
             float alpha = (float)i / totalHeight;
             float beta = (float)(i - (secondHalf ? pv2.getY() - pv1.getY():0)) / segmentHeight;
             Vector a = Vector.getSum(pv1.getVector(), 
                     Vector.getMultForNum(Vector.getDiff(pv3.getVector(), 
                             pv1.getVector()), alpha));
-            Vector b = secondHalf ? (Vector.getSum(pv2.getVector(), Vector.getMultForNum(Vector.getDiff(pv3.getVector(), pv2.getVector()), beta))) :
-                    (Vector.getSum(pv1.getVector(), Vector.getMultForNum(Vector.getDiff(pv2.getVector(), pv1.getVector()), beta)));
+            //double az = pv1.getZ() + (pv3.getZ() - pv1.getZ()) * alpha;
+            Vector b = secondHalf ? (Vector.getSum(pv2.getVector(), 
+                    Vector.getMultForNum(Vector.getDiff(pv3.getVector(), 
+                            pv2.getVector()), beta))) :
+                    (Vector.getSum(pv1.getVector(), 
+                            Vector.getMultForNum(Vector.getDiff(pv2.getVector(), 
+                                    pv1.getVector()), beta)));
+            /*double bz = secondHalf ? pv2.getZ() + (pv3.getZ() - pv2.getZ()) * beta :
+                    pv1.getZ() + (pv2.getZ() - pv1.getZ()) * beta;*/
             if (a.getX() > b.getX()) {
                 Vector tmp = a;
                 a = b;
                 b = tmp;
             }
-            for (int j = (int) a.getX(); j <= b.getX(); j++) {
+            for (int j = (int)(0.5 + a.getX()); j <= b.getX() + 1; j++) {
                 double phi = a.getX() == b.getX() ? 1. : (double)(j-a.getX())/(double)(b.getX()-a.getX());
-                Vector p = Vector.getSum(a, Vector.getMultForNum(Vector.getDiff(b, a), phi));
+                //Vector p = Vector.getSum(a, Vector.getMultForNum(Vector.getDiff(b, a), phi));
+                double pz = a.getZ() + (b.getZ() - a.getZ()) * phi;
                 int xCor = j + halfW;
-                int yCor = (int)(h - ((int)(p.getY() + 0.5) + halfH));
+                int yCor = (int)(0.5 + h - (pv1.getY() + i + halfH));
                 if (!(xCor < 0 || xCor >= w || yCor < 0 || yCor >= h)) {
-                    if (zBuffer[xCor][yCor] > p.getZ()) {
-                        Color color = new Color(rgb);
-                        double lDist = (light.getLocation().getZ() + light.getDistance() - p.getZ()) / light.getDistance();
+                    if (zBuffer[xCor][yCor] > pz) {
+                        
+                        double maxX = pv1.getX();
+                        if (pv2.getX() > maxX)
+                            maxX = pv2.getX();
+                        if (pv3.getX() > maxX)
+                            maxX = pv3.getX();
+                        double minX = pv1.getX();
+                        if (pv2.getX() < minX)
+                            minX = pv2.getX();
+                        if (pv3.getX() < minX)
+                            minX = pv3.getX();
+                        double maxY = pv3.getY();
+                        double minY = pv1.getY();
+                        
+                        double u = (maxX - j) / (maxX - minX);
+                        double v = i / (maxY - minY);
+                        
+                        //rgb = tr.getRGBTexture((int)(tr.getV1().getX() + j), (int)(tr.getV1().getY() + i));
+                        rgb = tr.getRGBTexture(u, v);
+                        int alphaColor = (rgb >> 24) & 0xff;
+                        int red = (rgb >> 16) & 0xff;
+                        int green = (rgb >>  8) & 0xff;
+                        int blue = (rgb ) & 0xff;
+                        double lDist = (light.getLocation().getZ() + light.getDistance() - pz) / light.getDistance();
                         lDist = lDist < 0 ? 0 : lDist;
-                        //System.out.println(lDist);
-                        int newRGB = (new Color((int)(color.getRed() * lDist),
-                            (int)(color.getGreen()* lDist),
-                            (int)(color.getBlue()* lDist))).getRGB();
-                        zBuffer[xCor][yCor] = p.getZ();
+                        double bright = brightness * lDist;
+                        red *= bright;
+                        green *= bright;
+                        blue *= bright;
+                        //alphaColor *= bright;
+                        int newRGB = blue + (green << 8) + (red << 16) + (alphaColor << 24);
+                        zBuffer[xCor][yCor] = pz;
                         bi.setRGB(xCor, yCor, newRGB);
                     }
                 }
-//                int xCor = j + halfW;
-//                int diffZ = az - bz == 0 ? 0 : 1 / (bz - az);
-//                double zb = (int)(az + diffZ * (j - ax) + 0.5);
-//                int yCor = (int) (h - (pv1.getY() + i + halfH) + 0.5);
-//                if (!(xCor < 0 || xCor >= w || yCor < 0 || yCor >= h)) {
-//                    if (zBuffer[xCor][yCor] > zb/* && zBuffer[xCor][yCor] == Integer.MAX_VALUE*/) {
-//                        Color color = new Color(rgb);
-//                        double lDist = (light.getLocation().getZ() + light.getDistance() - zb) / light.getDistance();
-//                        lDist = lDist < 0 ? 0 : lDist;
-//                        //System.out.println(lDist);
-//                        int newRGB = (new Color((int)(color.getRed() * lDist),
-//                            (int)(color.getGreen()* lDist),
-//                            (int)(color.getBlue()* lDist))).getRGB();
-//                        zBuffer[xCor][yCor] = zb;
-//                        bi.setRGB(xCor, yCor, newRGB);
-//                    }
-//                }
             }
         }
     }
