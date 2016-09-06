@@ -20,6 +20,7 @@ public class MyGraphicLib {
     public static void main(String[] args) {
         // TODO code application logic here
         JFrame frame = new JFrame();
+        System.out.println("hi");
         frame.setSize(Toolkit.getDefaultToolkit().getScreenSize().width,// / 10 * 8, 
                 Toolkit.getDefaultToolkit().getScreenSize().height/* / 10 * 8*/);
         //frame.setSize(1000, 500);
