@@ -13,7 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
@@ -53,7 +52,7 @@ public class RenderPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        long startTime = new GregorianCalendar().getTimeInMillis();
+        long startTime = System.currentTimeMillis();
         RenderedImage ri = new RenderedImage(g.getClipBounds().width, g.getClipBounds().height);
         ri.setModel(model);
         ri.paint();
@@ -61,8 +60,7 @@ public class RenderPanel extends JPanel {
             g2.setPaint(new TexturePaint(ri.getBufferedImage(), g.getClipBounds()));
             g2.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
         }
-        long endTime = new GregorianCalendar().getTimeInMillis();
-        time = (int) (endTime - startTime);
+        time = (int) (System.currentTimeMillis() - startTime);
         g2.setPaint(Color.WHITE);
         g2.drawString("Max FPS: " + 1000 / time, g.getClipBounds().width - 70, 20);
     }

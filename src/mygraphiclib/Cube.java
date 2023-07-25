@@ -8,7 +8,6 @@ package mygraphiclib;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -42,7 +41,7 @@ public class Cube extends Object3D{
         super.add(v7);
         /*
         super.setLine(0, 1);
-        super.setLine(0, 3);
+        super.setLine(0, 3);6
         super.setLine(0, 4);
         super.setLine(1, 2);
         super.setLine(1, 6);
